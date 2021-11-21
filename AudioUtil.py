@@ -1,9 +1,10 @@
 import math, random
 import torch
 import torchaudio
+from matplotlib import pyplot as plt
 from torchaudio import transforms
 from IPython.display import Audio
-
+import librosa
 
 class AudioUtil:
     # ----------------------------
@@ -37,7 +38,7 @@ class AudioUtil:
     # ----------------------------
 
     @staticmethod
-    def pad_trunc(aud, n_before_peak, n_after_peak):
+    def pad_trunc(aud, n_before_peak = 400, n_after_peak = 6600):
         sig, sr = aud
         peak_indice = 0
         peak_value = 0
@@ -61,3 +62,31 @@ class AudioUtil:
         # Convert to decibels
         spec = transforms.AmplitudeToDB(top_db=top_db)(spec)
         return spec
+
+    @staticmethod
+    def plot_spectrogram(spec, title=None, ylabel='freq_bin', aspect='auto', xmax=None):
+        fig, axs = plt.subplots(1, 1)
+        axs.set_title(title or 'Spectrogram (db)')
+        axs.set_ylabel(ylabel)
+        axs.set_xlabel('frame')
+        im = axs.imshow(librosa.power_to_db(spec), origin='lower', aspect=aspect)
+        if xmax:
+            axs.set_xlim((0, xmax))
+        fig.colorbar(im, ax=axs)
+        plt.show(block=False)
+
+    @staticmethod
+    def spectro_augment(spec, max_mask_pct=0.1, n_freq_masks=1, n_time_masks=1):
+        _, n_mels, n_steps = spec.shape
+        mask_value = spec.mean()
+        aug_spec = spec
+
+        freq_mask_param = max_mask_pct * n_mels
+        for _ in range(n_freq_masks):
+          aug_spec = transforms.FrequencyMasking(freq_mask_param)(aug_spec, mask_value)
+
+        time_mask_param = max_mask_pct * n_steps
+        for _ in range(n_time_masks):
+          aug_spec = transforms.TimeMasking(time_mask_param)(aug_spec, mask_value)
+
+        return aug_spec

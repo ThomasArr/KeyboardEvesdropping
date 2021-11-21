@@ -23,10 +23,12 @@ def test(filename):
 
 audioUtil = AudioUtil()
 
-file = audioUtil.open("./data/z1.wav")
+audio = audioUtil.open("./data/z1.wav")
 
-file = audioUtil.pad_trunc(file, 400, 6600)
+audio = audioUtil.pad_trunc(audio)
 
-sig, sr = file
-plt.plot(sig[0])
+melspec = audioUtil.spectro_gram(audio)
+
+melspec_augmented = audioUtil.spectro_augment(melspec)
+audioUtil.plot_spectrogram(melspec_augmented[0], title="MelSpectrogram - torchaudio", ylabel='mel freq')
 plt.show()
