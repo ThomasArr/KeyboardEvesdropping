@@ -6,6 +6,7 @@ from torchaudio import transforms
 from IPython.display import Audio
 import librosa
 
+
 class AudioUtil:
     # ----------------------------
     # Load an audio file. Return the signal as a tensor and the sample rate
@@ -14,6 +15,11 @@ class AudioUtil:
     def open(audio_file):
         sig, sr = torchaudio.load(audio_file)
         return sig, sr
+
+    @staticmethod
+    def save(path, audio_file, sample_rate=44100):
+        sig, sr = audio_file
+        torchaudio.save(path, sig, sample_rate, format="wav")
 
     @staticmethod
     def resample(aud, newsr):
@@ -38,7 +44,7 @@ class AudioUtil:
     # ----------------------------
 
     @staticmethod
-    def pad_trunc(aud, n_before_peak = 400, n_after_peak = 6600):
+    def pad_trunc(aud, n_before_peak=400, n_after_peak=6600):
         sig, sr = aud
         peak_indice = 0
         peak_value = 0
@@ -83,10 +89,10 @@ class AudioUtil:
 
         freq_mask_param = max_mask_pct * n_mels
         for _ in range(n_freq_masks):
-          aug_spec = transforms.FrequencyMasking(freq_mask_param)(aug_spec, mask_value)
+            aug_spec = transforms.FrequencyMasking(freq_mask_param)(aug_spec, mask_value)
 
         time_mask_param = max_mask_pct * n_steps
         for _ in range(n_time_masks):
-          aug_spec = transforms.TimeMasking(time_mask_param)(aug_spec, mask_value)
+            aug_spec = transforms.TimeMasking(time_mask_param)(aug_spec, mask_value)
 
         return aug_spec

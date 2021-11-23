@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from scipy.fftpack import fft
 from scipy.io import wavfile  # get the api
 
+from DataCreator import DataCreator
 from AudioUtil import AudioUtil
 
 
@@ -23,12 +24,14 @@ def test(filename):
 
 audioUtil = AudioUtil()
 
-audio = audioUtil.open("./data/z1.wav")
+DataCreator.createSamples("./data/z_list.wav")
+#audio = audioUtil.open("./data/z_list.wav")
 
-audio = audioUtil.pad_trunc(audio)
+#audio = audioUtil.pad_trunc(audio)
+#melspec = audioUtil.spectro_gram(audio)
 
-melspec = audioUtil.spectro_gram(audio)
-
-melspec_augmented = audioUtil.spectro_augment(melspec)
-audioUtil.plot_spectrogram(melspec_augmented[0], title="MelSpectrogram - torchaudio", ylabel='mel freq')
-plt.show()
+#melspec_augmented = audioUtil.spectro_augment(melspec)
+#audioUtil.plot_spectrogram(melspec_augmented[0], title="MelSpectrogram - torchaudio", ylabel='mel freq')
+# sig, ar = audio
+# plt.plot(sig[0])
+# plt.show()
