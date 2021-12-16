@@ -1,4 +1,6 @@
 import math, random
+
+import numpy as np
 import torch
 import torchaudio
 from matplotlib import pyplot as plt
@@ -8,6 +10,9 @@ import librosa
 
 
 class AudioUtil:
+    def __init__(self):
+        return
+
     # ----------------------------
     # Load an audio file. Return the signal as a tensor and the sample rate
     # ----------------------------
@@ -96,3 +101,25 @@ class AudioUtil:
             aug_spec = transforms.TimeMasking(time_mask_param)(aug_spec, mask_value)
 
         return aug_spec
+
+    @staticmethod
+    def tensorToNumpy(spec):
+        shape = spec.shape
+        l1 = []
+        for i in range(0, shape[1]):
+            l2 = []
+            for j in range(0, shape[2]):
+                l2.append(spec[0][i][j])
+            l1.append(l2)
+        return np.array(l1)
+
+    @staticmethod
+    def soundToNumpySpectrogram(audio_file):
+
+        aud = AudioUtil.open(audio_file)
+        print(audio_file)
+        dur_aud = AudioUtil.pad_trunc(aud)
+        melspec = AudioUtil.spectro_gram(dur_aud, n_mels=64, n_fft=1024, hop_len=None)
+        # melspec_augmented = AudioUtil.spectro_augment(melspec, max_mask_pct=0.1, n_freq_masks=2, n_time_masks=2)
+
+        return AudioUtil.tensorToNumpy(melspec)

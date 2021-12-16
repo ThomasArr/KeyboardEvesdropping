@@ -3,35 +3,46 @@
 # Press Maj+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 import matplotlib.pyplot as plt
-from scipy.fftpack import fft
-from scipy.io import wavfile  # get the api
+import numpy as np
 
-from DataCreator import DataCreator
 from AudioUtil import AudioUtil
 
+# myds = SoundDS("./data/")
+#
+# data_length = len(myds)
+# train_length = round(data_length * 0.8)
+# test_length = data_length - train_length
+#
+# train_ds, val_ds = random_split(myds, [train_length, test_length])
+from SoundDS import SoundDS
 
-def test(filename):
-    fs, data = wavfile.read(filename)  # load the data
-    a = data.T[0]  # this is a two channel soundtrack, I get the first track
-    b = [(ele / 2 ** 8.) * 2 - 1 for ele in a]  # this is 8-bit track, b is now normalized on [-1,1)
-    c = fft(b)  # calculate fourier transform (complex numbers list)
-    d = int(len(c) / 2)  # you only need half of the fft list (real signal symmetry)
-    plt.subplot(2)
-    plt.plot(abs(c[:(d - 1)]), 'r')
-    plt.plot(abs(a[:(d - 1)]), 'b')
-    plt.show()
+# from convolutionalNetwork import ConvNetwork
+from MLPClassifier import MLPClassifier
+from RFClassifier import RFClassifier
 
 
-audioUtil = AudioUtil()
+def t():
+    audio = AudioUtil.open("./data/q1.wav")
+    audio = AudioUtil.pad_trunc(audio)
 
-DataCreator.createSamples("./data/z_list.wav")
-#audio = audioUtil.open("./data/z_list.wav")
+    melspec = AudioUtil.spectro_gram(audio)
 
-#audio = audioUtil.pad_trunc(audio)
-#melspec = audioUtil.spectro_gram(audio)
+    # melspec_augmented = AudioUtil.spectro_augment(melspec)
+    print(melspec.shape)
+    print(AudioUtil.tensorToNumpy(melspec))
+    # AudioUtil.plot_spectrogram(melspec[0], title="MelSpectrogram - torchaudio", ylabel='mel freq')
 
-#melspec_augmented = audioUtil.spectro_augment(melspec)
-#audioUtil.plot_spectrogram(melspec_augmented[0], title="MelSpectrogram - torchaudio", ylabel='mel freq')
-# sig, ar = audio
-# plt.plot(sig[0])
-# plt.show()
+    # plt.show()
+
+
+DS = SoundDS(train_data_path="./data/", test_data_path="./data/test/")
+
+# AudioUtil.plot_spectrogram(DS.data[1], title="MelSpectrogram - torchaudio", ylabel='mel freq')
+# cnn_model = ConvNetwork(DS.data, DS.label)
+
+model = MLPClassifier()
+#print(model.crossValidate(DS.train_data, DS.train_label)) #[0.83333333 0.88888889 0.94117647 0.94117647 0.88235294]
+#print(model.random_tuning(DS.train_data, DS.train_label))
+model.train(DS.train_data, DS.train_label)
+print(model.score(DS.train_data, DS.train_label))
+print(model.predict(DS.test_data))

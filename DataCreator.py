@@ -16,9 +16,8 @@ class DataCreator:
                 if sig[0][index + k] > windowMax:
                     windowMax = sig[0][index + k]
                     windowMaxIndex = index + k
-            print(windowMax)
             if windowMax > intensityThreshold:
-                path = "./data/" + str(letter) + str(n) + ".wav"
+                path = "./data/test/" + str(letter) + str(n) + ".wav"
                 waveform = sig[:, windowMaxIndex - n_before_peak:windowMaxIndex + n_after_peak]
                 AudioUtil.save(path, (waveform, sr))
                 n += 1
@@ -28,3 +27,6 @@ class DataCreator:
     def getLetterFromPath(path):
         t = path.split("/")
         return t[-1][0]
+
+
+DataCreator.createSamples("./data/DataList/xxx2_list.wav")
